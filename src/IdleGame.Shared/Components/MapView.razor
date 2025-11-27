@@ -1,0 +1,100 @@
+@using IdleGame.Core.Models.Maps
+@using IdleGame.Core.Models.Combat
+
+<div class="map-view">
+    <div class="map-header">
+        <h3>@Map.Name</h3>
+        <span class="map-level">Level @Map.Level</span>
+        <span class="map-progress">@Map.MonstersKilled / @Map.TotalMonsters monsters</span>
+    </div>
+
+    <div class="map-grid" style="--map-width: @Map.Width; --map-height: @Map.Height;">
+        @for (var y = 0; y < Map.Height; y++)
+        {
+            @for (var x = 0; x < Map.Width; x++)
+            {
+                var tile = Map.GetTile(x, y);
+                var isPlayer = x == Map.PlayerX && y == Map.PlayerY;
+                var monsters = Map.GetMonstersAt(x, y).ToList();
+                
+                <div class="map-tile @GetTileClass(tile) @(isPlayer ? "player-tile" : "") @(tile?.IsRevealed == true ? "revealed" : "hidden")"
+                     @onclick="() => OnTileClick(x, y)">
+                    @if (isPlayer)
+                    {
+                        <span class="tile-content player">@PlayerIcon</span>
+                    }
+                    else if (monsters.Any() && tile?.IsRevealed == true)
+                    {
+                        <span class="tile-content monster @GetMonsterClass(monsters.First())">@MonsterIcon</span>
+                    }
+                    else if (tile?.Type == TileType.Start)
+                    {
+                        <span class="tile-content start">S</span>
+                    }
+                    else if (tile?.Type == TileType.Exit)
+                    {
+                        <span class="tile-content exit">E</span>
+                    }
+                    else if (tile?.Type == TileType.Chest)
+                    {
+                        <span class="tile-content chest">C</span>
+                    }
+                </div>
+            }
+        }
+    </div>
+
+    <div class="map-info">
+        <p>Position: (@Map.PlayerX, @Map.PlayerY)</p>
+        <p>Time: @Map.TimeSpent.ToString(@"hh\:mm\:ss")</p>
+        @if (Map.IsCompleted)
+        {
+            <p class="completed">Map Completed!</p>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public MapInstance Map { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<(int x, int y)> OnTileClicked { get; set; }
+
+    private string PlayerIcon = "●";
+    private string MonsterIcon = "☠";
+
+    private string GetTileClass(MapTile? tile)
+    {
+        if (tile == null) return "tile-wall";
+        
+        return tile.Type switch
+        {
+            TileType.Floor => "tile-floor",
+            TileType.Wall => "tile-wall",
+            TileType.Start => "tile-start",
+            TileType.Exit => "tile-exit",
+            TileType.Chest => "tile-chest",
+            TileType.Shrine => "tile-shrine",
+            _ => "tile-floor"
+        };
+    }
+
+    private string GetMonsterClass(Monster monster)
+    {
+        return monster.Type switch
+        {
+            MonsterType.Normal => "monster-normal",
+            MonsterType.Magic => "monster-magic",
+            MonsterType.Rare => "monster-rare",
+            MonsterType.Unique => "monster-unique",
+            MonsterType.Boss => "monster-boss",
+            _ => "monster-normal"
+        };
+    }
+
+    private async Task OnTileClick(int x, int y)
+    {
+        await OnTileClicked.InvokeAsync((x, y));
+    }
+}

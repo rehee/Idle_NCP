@@ -1,0 +1,94 @@
+@using IdleGame.Core.Services
+
+<div class="idle-results">
+    <h4>Idle Results (@Result.Duration.ToString(@"hh\:mm\:ss"))</h4>
+    
+    <div class="result-stats">
+        <div class="result-row">
+            <span class="result-label">Monsters Killed:</span>
+            <span class="result-value">@Result.MonstersKilled</span>
+        </div>
+        <div class="result-row">
+            <span class="result-label">Experience Gained:</span>
+            <span class="result-value xp">+@Result.ExperienceGained.ToString("N0")</span>
+        </div>
+        <div class="result-row">
+            <span class="result-label">Gold Earned:</span>
+            <span class="result-value gold">+@Result.GoldGained.ToString("N0")</span>
+        </div>
+    </div>
+
+    @if (Result.LeveledUp)
+    {
+        <div class="level-up">
+            <span>🎉 Level Up! @Result.StartLevel → @Result.EndLevel</span>
+        </div>
+    }
+
+    @if (Result.ItemsFound.Any())
+    {
+        <div class="items-found">
+            <h5>Items Found (@Result.ItemsFound.Count)</h5>
+            <div class="items-list">
+                @foreach (var item in Result.ItemsFound.Take(10))
+                {
+                    <div class="item-entry @GetRarityClass(item.Rarity)">
+                        @item.Name
+                    </div>
+                }
+                @if (Result.ItemsFound.Count > 10)
+                {
+                    <div class="more-items">...and @(Result.ItemsFound.Count - 10) more</div>
+                }
+            </div>
+        </div>
+    }
+
+    @if (Result.CurrencyGained.Any())
+    {
+        <div class="currency-found">
+            <h5>Currency Found</h5>
+            <div class="currency-list">
+                @foreach (var currency in Result.CurrencyGained)
+                {
+                    <div class="currency-entry">
+                        @currency.Type x@currency.Amount
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    @if (Result.PlayerDied)
+    {
+        <div class="player-died">
+            <span>💀 You died!</span>
+        </div>
+    }
+
+    @if (Result.MapCompleted)
+    {
+        <div class="map-completed">
+            <span>🏆 Map Completed!</span>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public IdleResult Result { get; set; } = new();
+
+    private string GetRarityClass(IdleGame.Core.Models.Items.ItemRarity rarity)
+    {
+        return rarity switch
+        {
+            IdleGame.Core.Models.Items.ItemRarity.Normal => "rarity-normal",
+            IdleGame.Core.Models.Items.ItemRarity.Magic => "rarity-magic",
+            IdleGame.Core.Models.Items.ItemRarity.Rare => "rarity-rare",
+            IdleGame.Core.Models.Items.ItemRarity.Legendary => "rarity-legendary",
+            IdleGame.Core.Models.Items.ItemRarity.Unique => "rarity-unique",
+            IdleGame.Core.Models.Items.ItemRarity.Artifact => "rarity-artifact",
+            _ => "rarity-normal"
+        };
+    }
+}

@@ -1,0 +1,123 @@
+@using IdleGame.Core.Models.Characters
+@using IdleGame.Core.Models.Items
+
+<div class="character-panel">
+    <div class="character-header">
+        <h3>@Character.Name</h3>
+        <span class="character-class">@Character.Class</span>
+        <span class="character-level">Level @Character.Level</span>
+    </div>
+    
+    <div class="experience-bar">
+        <div class="experience-fill" style="width: @GetExperiencePercentage()%"></div>
+        <span class="experience-text">@Character.Experience / @Character.ExperienceToNextLevel</span>
+    </div>
+
+    <div class="character-stats">
+        <h4>Base Stats</h4>
+        <div class="stat-row">
+            <span class="stat-label">Strength:</span>
+            <span class="stat-value">@Stats.Strength.ToString("F0")</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Dexterity:</span>
+            <span class="stat-value">@Stats.Dexterity.ToString("F0")</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Intelligence:</span>
+            <span class="stat-value">@Stats.Intelligence.ToString("F0")</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Vitality:</span>
+            <span class="stat-value">@Stats.Vitality.ToString("F0")</span>
+        </div>
+    </div>
+
+    <div class="character-stats">
+        <h4>Defenses</h4>
+        <div class="stat-row">
+            <span class="stat-label">Life:</span>
+            <span class="stat-value">@Stats.CurrentLife.ToString("F0") / @Stats.MaxLife.ToString("F0")</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Mana:</span>
+            <span class="stat-value">@Stats.CurrentMana.ToString("F0") / @Stats.MaxMana.ToString("F0")</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Armor:</span>
+            <span class="stat-value">@Stats.Armor.ToString("F0")</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Evasion:</span>
+            <span class="stat-value">@Stats.Evasion.ToString("F0")</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Energy Shield:</span>
+            <span class="stat-value">@Stats.EnergyShield.ToString("F0")</span>
+        </div>
+    </div>
+
+    <div class="character-stats">
+        <h4>Resistances</h4>
+        <div class="stat-row">
+            <span class="stat-label fire">Fire:</span>
+            <span class="stat-value">@Stats.FireResistance.ToString("F0")%</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label cold">Cold:</span>
+            <span class="stat-value">@Stats.ColdResistance.ToString("F0")%</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label lightning">Lightning:</span>
+            <span class="stat-value">@Stats.LightningResistance.ToString("F0")%</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label chaos">Chaos:</span>
+            <span class="stat-value">@Stats.ChaosResistance.ToString("F0")%</span>
+        </div>
+    </div>
+
+    <div class="character-stats">
+        <h4>Offense</h4>
+        <div class="stat-row">
+            <span class="stat-label">Physical Damage:</span>
+            <span class="stat-value">@Stats.PhysicalDamage.ToString("F0")</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Attack Speed:</span>
+            <span class="stat-value">@Stats.AttackSpeed.ToString("F2")</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Critical Chance:</span>
+            <span class="stat-value">@Stats.CriticalChance.ToString("F1")%</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Critical Multiplier:</span>
+            <span class="stat-value">@Stats.CriticalMultiplier.ToString("F0")%</span>
+        </div>
+        <div class="stat-row highlight">
+            <span class="stat-label">DPS:</span>
+            <span class="stat-value">@Stats.CalculateDPS().ToString("F1")</span>
+        </div>
+    </div>
+
+    <div class="character-resources">
+        <div class="stat-row">
+            <span class="stat-label">Gold:</span>
+            <span class="stat-value gold">@Character.Inventory.Gold.ToString("N0")</span>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Character Character { get; set; } = new();
+
+    private CharacterStats Stats => Character.CalculateTotalStats();
+
+    private double GetExperiencePercentage()
+    {
+        if (Character.ExperienceToNextLevel <= 0) return 0;
+        return (double)Character.Experience / Character.ExperienceToNextLevel * 100;
+    }
+}

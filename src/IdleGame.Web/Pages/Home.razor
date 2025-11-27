@@ -1,0 +1,190 @@
+﻿@page "/"
+@inject GameService GameService
+
+<PageTitle>Idle Game</PageTitle>
+
+<div class="game-container">
+    @if (_gameState == null)
+    {
+        <div class="create-character">
+            <h1>⚔️ Idle RPG ⚔️</h1>
+            <p>Create your character to begin your adventure</p>
+            
+            <div class="form-group">
+                <label>Character Name</label>
+                <input type="text" @bind="_characterName" placeholder="Enter name..." />
+            </div>
+            
+            <div class="form-group">
+                <label>Class</label>
+                <select @bind="_selectedClass">
+                    <option value="Warrior">⚔️ Warrior</option>
+                    <option value="Ranger">🏹 Ranger</option>
+                    <option value="Mage">🔮 Mage</option>
+                    <option value="Rogue">🗡️ Rogue</option>
+                </select>
+            </div>
+            
+            <button class="btn-create" @onclick="CreateCharacter">Create Character</button>
+        </div>
+    }
+    else if (_gameState?.Character != null)
+    {
+        <div class="game-layout">
+            <div class="left-panel">
+                <CharacterPanel Character="@_gameState.Character" />
+            </div>
+            
+            <div class="center-panel">
+                @if (_currentMap != null)
+                {
+                    <MapView Map="@_currentMap" OnTileClicked="OnTileClicked" />
+                    
+                    <div class="combat-controls">
+                        @if (!_isIdling)
+                        {
+                            <button class="btn-idle" @onclick="StartIdling">▶️ Start Idle</button>
+                        }
+                        else
+                        {
+                            <button class="btn-stop" @onclick="StopIdling">⏹️ Stop</button>
+                        }
+                        <button class="btn-leave" @onclick="LeaveMap">🚪 Leave Map</button>
+                    </div>
+                    
+                    @if (_lastIdleResult != null)
+                    {
+                        <IdleResultsPanel Result="@_lastIdleResult" />
+                    }
+                }
+                else
+                {
+                    <div class="map-selection">
+                        <h2>Select a Map</h2>
+                        <div class="maps-grid">
+                            @foreach (var map in _availableMaps)
+                            {
+                                <div class="map-card" @onclick="() => StartMap(map.Id)">
+                                    <h3>@map.Name</h3>
+                                    <p>Level @map.BaseLevel+</p>
+                                    <p class="map-desc">@map.Description</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+            
+            <div class="right-panel">
+                <InventoryPanel 
+                    Inventory="@_gameState.Character.Inventory"
+                    OnEquip="EquipItem" 
+                    OnSell="SellItem" />
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private GameState? _gameState;
+    private MapInstance? _currentMap;
+    private List<MapDefinition> _availableMaps = new();
+    private IdleResult? _lastIdleResult;
+    private bool _isIdling;
+    private System.Timers.Timer? _idleTimer;
+    
+    private string _characterName = "";
+    private string _selectedClass = "Warrior";
+
+    protected override void OnInitialized()
+    {
+        _availableMaps = GameService.MapService.GetAllMaps().ToList();
+    }
+
+    private void CreateCharacter()
+    {
+        if (string.IsNullOrWhiteSpace(_characterName))
+        {
+            _characterName = "Hero";
+        }
+        
+        var characterClass = Enum.Parse<CharacterClass>(_selectedClass);
+        var character = GameService.CreateCharacter(_characterName, characterClass);
+        
+        _gameState = new GameState
+        {
+            Character = character,
+            IsServerMode = false
+        };
+    }
+
+    private void StartMap(string mapId)
+    {
+        if (_gameState?.Character == null) return;
+        
+        _currentMap = GameService.StartMapRun(_gameState.Character, mapId);
+        _lastIdleResult = null;
+    }
+
+    private void LeaveMap()
+    {
+        StopIdling();
+        _currentMap = null;
+    }
+
+    private void StartIdling()
+    {
+        _isIdling = true;
+        _idleTimer = new System.Timers.Timer(1000); // 1 second intervals
+        _idleTimer.Elapsed += async (s, e) => await SimulateIdleTick();
+        _idleTimer.Start();
+    }
+
+    private void StopIdling()
+    {
+        _isIdling = false;
+        _idleTimer?.Stop();
+        _idleTimer?.Dispose();
+        _idleTimer = null;
+    }
+
+    private async Task SimulateIdleTick()
+    {
+        if (_gameState?.Character == null || _currentMap == null) return;
+        
+        _lastIdleResult = GameService.SimulateIdle(_gameState.Character, _currentMap, TimeSpan.FromSeconds(1));
+        
+        await InvokeAsync(StateHasChanged);
+        
+        if (_currentMap.IsCompleted || _lastIdleResult.PlayerDied)
+        {
+            StopIdling();
+        }
+    }
+
+    private Task OnTileClicked((int x, int y) position)
+    {
+        if (_currentMap != null && !_isIdling)
+        {
+            _currentMap.MovePlayer(position.x, position.y);
+        }
+        return Task.CompletedTask;
+    }
+
+    private void EquipItem(Item item)
+    {
+        if (_gameState?.Character == null) return;
+        GameService.EquipItem(_gameState.Character, item);
+    }
+
+    private void SellItem(Item item)
+    {
+        if (_gameState?.Character == null) return;
+        GameService.SellItem(_gameState.Character, item);
+    }
+
+    public void Dispose()
+    {
+        _idleTimer?.Dispose();
+    }
+}

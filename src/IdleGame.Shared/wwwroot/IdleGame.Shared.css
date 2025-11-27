@@ -1,0 +1,525 @@
+/* IdleGame Shared Styles */
+
+/* Color variables */
+:root {
+    --color-normal: #c8c8c8;
+    --color-magic: #8888ff;
+    --color-rare: #ffff77;
+    --color-legendary: #ff8800;
+    --color-unique: #af6025;
+    --color-artifact: #e535ab;
+    
+    --color-fire: #ff6b35;
+    --color-cold: #35a7ff;
+    --color-lightning: #ffeb3b;
+    --color-chaos: #9c27b0;
+    
+    --color-gold: #ffd700;
+    --color-xp: #00ff88;
+    
+    --bg-dark: #1a1a2e;
+    --bg-panel: #16213e;
+    --bg-item: #0f3460;
+    --border-color: #3a3a5c;
+}
+
+/* Item Display */
+.item-display {
+    background: var(--bg-item);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px;
+    min-width: 250px;
+    max-width: 350px;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.item-display.rarity-normal { border-color: var(--color-normal); }
+.item-display.rarity-magic { border-color: var(--color-magic); }
+.item-display.rarity-rare { border-color: var(--color-rare); }
+.item-display.rarity-legendary { border-color: var(--color-legendary); }
+.item-display.rarity-unique { border-color: var(--color-unique); }
+.item-display.rarity-artifact { border-color: var(--color-artifact); }
+
+.item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.item-name {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.rarity-normal .item-name { color: var(--color-normal); }
+.rarity-magic .item-name { color: var(--color-magic); }
+.rarity-rare .item-name { color: var(--color-rare); }
+.rarity-legendary .item-name { color: var(--color-legendary); }
+.rarity-unique .item-name { color: var(--color-unique); }
+.rarity-artifact .item-name { color: var(--color-artifact); }
+
+.item-level {
+    color: #888;
+    font-size: 0.9em;
+}
+
+.item-body {
+    font-size: 0.95em;
+}
+
+.item-stat {
+    color: #aaa;
+    padding: 2px 0;
+}
+
+.item-separator {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 8px 0;
+}
+
+.item-affix {
+    padding: 2px 0;
+    color: var(--color-magic);
+}
+
+.item-affix.implicit { color: #66ccff; }
+.item-affix.fixed { color: #00ff88; }
+.item-affix.legendary { color: var(--color-legendary); font-weight: bold; }
+
+.item-requirement {
+    color: #ff6666;
+    font-size: 0.9em;
+}
+
+/* Character Panel */
+.character-panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    color: #eee;
+}
+
+.character-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.character-header h3 {
+    margin: 0;
+    color: var(--color-rare);
+}
+
+.character-class {
+    color: #888;
+}
+
+.character-level {
+    color: var(--color-xp);
+    font-weight: bold;
+}
+
+.experience-bar {
+    height: 20px;
+    background: #333;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.experience-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50, #8bc34a);
+    transition: width 0.3s ease;
+}
+
+.experience-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.8em;
+    color: white;
+    text-shadow: 1px 1px 2px black;
+}
+
+.character-stats {
+    margin-bottom: 16px;
+}
+
+.character-stats h4 {
+    margin: 0 0 8px 0;
+    color: #aaa;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 4px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+}
+
+.stat-row.highlight {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 8px;
+    border-radius: 4px;
+    margin: 4px -8px;
+}
+
+.stat-label {
+    color: #aaa;
+}
+
+.stat-label.fire { color: var(--color-fire); }
+.stat-label.cold { color: var(--color-cold); }
+.stat-label.lightning { color: var(--color-lightning); }
+.stat-label.chaos { color: var(--color-chaos); }
+
+.stat-value {
+    font-weight: bold;
+}
+
+.stat-value.gold { color: var(--color-gold); }
+
+/* Map View */
+.map-view {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.map-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.map-header h3 {
+    margin: 0;
+}
+
+.map-level {
+    color: var(--color-xp);
+}
+
+.map-progress {
+    color: #888;
+}
+
+.map-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--map-width), 20px);
+    gap: 1px;
+    background: #111;
+    padding: 4px;
+    border-radius: 4px;
+    overflow: auto;
+    max-height: 400px;
+}
+
+.map-tile {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.map-tile:hover {
+    filter: brightness(1.2);
+}
+
+.tile-floor { background: #2a2a4a; }
+.tile-wall { background: #111; }
+.tile-start { background: #1a4a1a; }
+.tile-exit { background: #4a1a1a; }
+.tile-chest { background: #4a4a1a; }
+
+.map-tile.hidden {
+    background: #0a0a0a;
+}
+
+.map-tile.player-tile {
+    background: #1a1a6a;
+}
+
+.tile-content {
+    font-size: 14px;
+}
+
+.tile-content.player { color: #00ff00; }
+.tile-content.monster { color: #ff0000; }
+.tile-content.start { color: #00ff88; }
+.tile-content.exit { color: #ff8800; }
+.tile-content.chest { color: var(--color-gold); }
+
+.monster-normal { }
+.monster-magic { color: var(--color-magic); }
+.monster-rare { color: var(--color-rare); }
+.monster-unique { color: var(--color-unique); }
+.monster-boss { color: var(--color-legendary); font-size: 16px; }
+
+.map-info {
+    margin-top: 12px;
+    color: #888;
+    font-size: 0.9em;
+}
+
+.map-info .completed {
+    color: var(--color-xp);
+    font-weight: bold;
+}
+
+/* Inventory Panel */
+.inventory-panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.inventory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.inventory-header h3 {
+    margin: 0;
+    color: #eee;
+}
+
+.inventory-slots {
+    color: #888;
+}
+
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 40px);
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.inventory-slot {
+    width: 40px;
+    height: 40px;
+    background: var(--bg-item);
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.inventory-slot:hover {
+    border-color: #666;
+    transform: scale(1.05);
+}
+
+.inventory-slot.empty {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.inventory-slot.empty:hover {
+    transform: none;
+}
+
+.inventory-slot.rarity-magic { border-color: var(--color-magic); }
+.inventory-slot.rarity-rare { border-color: var(--color-rare); }
+.inventory-slot.rarity-legendary { border-color: var(--color-legendary); }
+.inventory-slot.rarity-unique { border-color: var(--color-unique); }
+.inventory-slot.rarity-artifact { border-color: var(--color-artifact); }
+
+.item-icon {
+    font-size: 20px;
+}
+
+.currency-panel h4 {
+    margin: 0 0 8px 0;
+    color: #aaa;
+    font-size: 0.9em;
+}
+
+.currency-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.currency-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--bg-item);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.currency-icon {
+    font-size: 16px;
+}
+
+.currency-amount {
+    color: #eee;
+    font-weight: bold;
+}
+
+.selected-item-panel {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+}
+
+.item-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-equip {
+    background: #4caf50;
+    color: white;
+}
+
+.btn-sell {
+    background: var(--color-gold);
+    color: #333;
+}
+
+.btn-drop {
+    background: #f44336;
+    color: white;
+}
+
+/* Idle Results Panel */
+.idle-results {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    color: #eee;
+}
+
+.idle-results h4 {
+    margin: 0 0 12px 0;
+    color: var(--color-rare);
+}
+
+.result-stats {
+    margin-bottom: 16px;
+}
+
+.result-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+}
+
+.result-label {
+    color: #aaa;
+}
+
+.result-value {
+    font-weight: bold;
+}
+
+.result-value.xp { color: var(--color-xp); }
+.result-value.gold { color: var(--color-gold); }
+
+.level-up {
+    background: linear-gradient(90deg, #ffd700, #ff8c00);
+    color: #333;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    margin: 12px 0;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+.items-found, .currency-found {
+    margin-top: 12px;
+}
+
+.items-found h5, .currency-found h5 {
+    margin: 0 0 8px 0;
+    color: #888;
+}
+
+.items-list, .currency-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.item-entry {
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.item-entry.rarity-magic { color: var(--color-magic); }
+.item-entry.rarity-rare { color: var(--color-rare); }
+.item-entry.rarity-legendary { color: var(--color-legendary); }
+.item-entry.rarity-unique { color: var(--color-unique); }
+.item-entry.rarity-artifact { color: var(--color-artifact); }
+
+.more-items {
+    color: #666;
+    font-style: italic;
+}
+
+.player-died {
+    background: #4a0000;
+    color: #ff6666;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.map-completed {
+    background: #004a00;
+    color: var(--color-xp);
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+}

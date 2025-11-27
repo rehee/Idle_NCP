@@ -1,0 +1,131 @@
+@using IdleGame.Core.Models.Characters
+@using IdleGame.Core.Models.Items
+
+<div class="inventory-panel">
+    <div class="inventory-header">
+        <h3>Inventory</h3>
+        <span class="inventory-slots">@Inventory.Items.Count / @Inventory.MaxSlots</span>
+    </div>
+
+    <div class="inventory-grid">
+        @foreach (var item in Inventory.Items)
+        {
+            <div class="inventory-slot @GetRarityClass(item)" 
+                 @onclick="() => OnItemClick(item)"
+                 title="@item.Name">
+                <span class="item-icon">@GetItemIcon(item)</span>
+            </div>
+        }
+        @for (var i = Inventory.Items.Count; i < Inventory.MaxSlots; i++)
+        {
+            <div class="inventory-slot empty"></div>
+        }
+    </div>
+
+    <div class="currency-panel">
+        <h4>Currency</h4>
+        <div class="currency-grid">
+            @foreach (var currency in Inventory.Currencies.Where(c => c.Amount > 0))
+            {
+                <div class="currency-item" title="@currency.Type">
+                    <span class="currency-icon">@GetCurrencyIcon(currency.Type)</span>
+                    <span class="currency-amount">@currency.Amount</span>
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (SelectedItem != null)
+    {
+        <div class="selected-item-panel">
+            <IdleGame.Shared.Components.ItemDisplay Item="@SelectedItem" ShowDetails="true" />
+            <div class="item-actions">
+                @if (OnEquip.HasDelegate)
+                {
+                    <button class="btn btn-equip" @onclick="() => OnEquip.InvokeAsync(SelectedItem)">Equip</button>
+                }
+                @if (OnSell.HasDelegate)
+                {
+                    <button class="btn btn-sell" @onclick="() => OnSell.InvokeAsync(SelectedItem)">Sell</button>
+                }
+                @if (OnDrop.HasDelegate)
+                {
+                    <button class="btn btn-drop" @onclick="() => OnDrop.InvokeAsync(SelectedItem)">Drop</button>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Inventory Inventory { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<Item> OnEquip { get; set; }
+
+    [Parameter]
+    public EventCallback<Item> OnSell { get; set; }
+
+    [Parameter]
+    public EventCallback<Item> OnDrop { get; set; }
+
+    private Item? SelectedItem { get; set; }
+
+    private void OnItemClick(Item item)
+    {
+        SelectedItem = SelectedItem == item ? null : item;
+    }
+
+    private string GetRarityClass(Item item)
+    {
+        return item.Rarity switch
+        {
+            ItemRarity.Normal => "rarity-normal",
+            ItemRarity.Magic => "rarity-magic",
+            ItemRarity.Rare => "rarity-rare",
+            ItemRarity.Legendary => "rarity-legendary",
+            ItemRarity.Unique => "rarity-unique",
+            ItemRarity.Artifact => "rarity-artifact",
+            _ => "rarity-normal"
+        };
+    }
+
+    private string GetItemIcon(Item item)
+    {
+        return item.Slot switch
+        {
+            EquipmentSlot.Helmet => "⛑",
+            EquipmentSlot.Chest => "🛡",
+            EquipmentSlot.Gloves => "🧤",
+            EquipmentSlot.Boots => "👢",
+            EquipmentSlot.Belt => "📿",
+            EquipmentSlot.Amulet => "💎",
+            EquipmentSlot.RingLeft or EquipmentSlot.RingRight => "💍",
+            EquipmentSlot.MainHand => "⚔️",
+            EquipmentSlot.OffHand => "🛡",
+            EquipmentSlot.TwoHand => "🗡️",
+            _ => "📦"
+        };
+    }
+
+    private string GetCurrencyIcon(Core.Models.Crafting.CurrencyType type)
+    {
+        return type switch
+        {
+            Core.Models.Crafting.CurrencyType.TransmutationOrb => "🔮",
+            Core.Models.Crafting.CurrencyType.AlchemyOrb => "⚗️",
+            Core.Models.Crafting.CurrencyType.AugmentationOrb => "➕",
+            Core.Models.Crafting.CurrencyType.AlterationOrb => "🔄",
+            Core.Models.Crafting.CurrencyType.ScouringOrb => "🧹",
+            Core.Models.Crafting.CurrencyType.ChaosOrb => "🌀",
+            Core.Models.Crafting.CurrencyType.ExaltedOrb => "⭐",
+            Core.Models.Crafting.CurrencyType.DivineOrb => "✨",
+            Core.Models.Crafting.CurrencyType.LegendaryOrb => "👑",
+            Core.Models.Crafting.CurrencyType.ArtifactStone => "💠",
+            Core.Models.Crafting.CurrencyType.QualityScroll => "📜",
+            Core.Models.Crafting.CurrencyType.IdentificationScroll => "🔍",
+            _ => "●"
+        };
+    }
+}
