@@ -1,0 +1,160 @@
+@using IdleGame.Core.Models.Items
+@using IdleGame.Core.Models.Affixes
+
+<div class="item-display @GetRarityClass()">
+    <div class="item-header">
+        <span class="item-name">@Item.Name</span>
+        <span class="item-level">iLvl @Item.ItemLevel</span>
+    </div>
+    
+    @if (ShowDetails)
+    {
+        <div class="item-body">
+            @if (Item.BaseArmor > 0)
+            {
+                <div class="item-stat">Armor: @Item.BaseArmor</div>
+            }
+            @if (Item.BaseEvasion > 0)
+            {
+                <div class="item-stat">Evasion: @Item.BaseEvasion</div>
+            }
+            @if (Item.BaseEnergyShield > 0)
+            {
+                <div class="item-stat">Energy Shield: @Item.BaseEnergyShield</div>
+            }
+            @if (Item.BaseMinDamage > 0 || Item.BaseMaxDamage > 0)
+            {
+                <div class="item-stat">Damage: @Item.BaseMinDamage - @Item.BaseMaxDamage</div>
+            }
+            @if (Item.BaseAttackSpeed > 0)
+            {
+                <div class="item-stat">Attack Speed: @Item.BaseAttackSpeed.ToString("F2")</div>
+            }
+            @if (Item.BaseCriticalChance > 0)
+            {
+                <div class="item-stat">Critical Chance: @Item.BaseCriticalChance.ToString("F1")%</div>
+            }
+
+            @if (Item.ImplicitAffixes.Any())
+            {
+                <hr class="item-separator" />
+                @foreach (var affix in Item.ImplicitAffixes)
+                {
+                    <div class="item-affix implicit">@FormatAffix(affix)</div>
+                }
+            }
+
+            @if (Item.FixedAffixes.Any() || Item.Prefixes.Any() || Item.Suffixes.Any() || Item.LegendaryAffix != null)
+            {
+                <hr class="item-separator" />
+            }
+
+            @foreach (var affix in Item.FixedAffixes)
+            {
+                <div class="item-affix fixed">@FormatAffix(affix)</div>
+            }
+
+            @foreach (var affix in Item.Prefixes)
+            {
+                <div class="item-affix prefix">@FormatAffix(affix)</div>
+            }
+
+            @foreach (var affix in Item.Suffixes)
+            {
+                <div class="item-affix suffix">@FormatAffix(affix)</div>
+            }
+
+            @if (Item.LegendaryAffix != null)
+            {
+                <div class="item-affix legendary">@FormatAffix(Item.LegendaryAffix)</div>
+            }
+
+            @if (Item.RequiredLevel > 1)
+            {
+                <hr class="item-separator" />
+                <div class="item-requirement">Requires Level @Item.RequiredLevel</div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Item Item { get; set; } = new();
+
+    [Parameter]
+    public bool ShowDetails { get; set; } = true;
+
+    private string GetRarityClass()
+    {
+        return Item.Rarity switch
+        {
+            ItemRarity.Normal => "rarity-normal",
+            ItemRarity.Magic => "rarity-magic",
+            ItemRarity.Rare => "rarity-rare",
+            ItemRarity.Legendary => "rarity-legendary",
+            ItemRarity.Unique => "rarity-unique",
+            ItemRarity.Artifact => "rarity-artifact",
+            _ => "rarity-normal"
+        };
+    }
+
+    private string FormatAffix(ItemAffix affix)
+    {
+        var parts = new List<string>();
+        foreach (var mod in affix.GetEffectiveModifiers())
+        {
+            parts.Add(FormatModifier(mod));
+        }
+        return string.Join(", ", parts);
+    }
+
+    private string FormatModifier(StatModifier mod)
+    {
+        var parts = new List<string>();
+
+        if (mod.FlatValue != 0)
+        {
+            parts.Add($"{mod.FlatValue:+0;-0} {FormatStatType(mod.StatType)}");
+        }
+
+        if (mod.PercentValue != 0)
+        {
+            parts.Add($"{mod.PercentValue:+0;-0}% increased {FormatStatType(mod.StatType)}");
+        }
+
+        if (mod.MoreMultiplier != 0)
+        {
+            parts.Add($"{mod.MoreMultiplier:+0;-0}% more {FormatStatType(mod.StatType)}");
+        }
+
+        return string.Join(", ", parts);
+    }
+
+    private string FormatStatType(StatType statType)
+    {
+        return statType switch
+        {
+            StatType.MaxLife => "Maximum Life",
+            StatType.MaxMana => "Maximum Mana",
+            StatType.PhysicalDamage => "Physical Damage",
+            StatType.FireDamage => "Fire Damage",
+            StatType.ColdDamage => "Cold Damage",
+            StatType.LightningDamage => "Lightning Damage",
+            StatType.ChaosDamage => "Chaos Damage",
+            StatType.Armor => "Armor",
+            StatType.Evasion => "Evasion",
+            StatType.EnergyShield => "Energy Shield",
+            StatType.FireResistance => "Fire Resistance",
+            StatType.ColdResistance => "Cold Resistance",
+            StatType.LightningResistance => "Lightning Resistance",
+            StatType.ChaosResistance => "Chaos Resistance",
+            StatType.AllResistances => "All Elemental Resistances",
+            StatType.AttackSpeed => "Attack Speed",
+            StatType.CriticalChance => "Critical Strike Chance",
+            StatType.CriticalMultiplier => "Critical Strike Multiplier",
+            StatType.LifeRegeneration => "Life Regeneration",
+            _ => statType.ToString()
+        };
+    }
+}
